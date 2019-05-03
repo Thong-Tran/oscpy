@@ -325,7 +325,15 @@ class OSCThreadServer(object):
                     continue
 
             for sender_socket in read:
-                data, sender = sender_socket.recvfrom(65535)
+                try:
+                    data, sender = sender_socket.recvfrom(65535)
+                except OSError as e:
+                    from sys import platform
+                    if platform == 'win32'
+                        continue
+                    else:
+                        raise e
+
                 for address, tags, values, offset in read_packet(
                     data, drop_late=drop_late, encoding=self.encoding,
                     encoding_errors=self.encoding_errors
@@ -437,11 +445,13 @@ class OSCThreadServer(object):
             of a message (i.e, inside a callback).
         """
         frames = inspect.getouterframes(inspect.currentframe())
+        filenames = ''
         for frame, filename, _, function, _, _ in frames:
-            if function == '_listen' and __file__.startswith(filename):
+            filenames += '\n{} {}'.format(filename, function)
+            if function == '_listen' and re.search(r'oscpy[\\/]server\.py', filename):
                 break
         else:
-            raise RuntimeError('get_sender() not called from a callback')
+            raise RuntimeError('get_sender() not called from a callback in file {} {}'.format(__file__, filenames))
 
         sock = frame.f_locals.get('sender_socket')
         address, port = frame.f_locals.get('sender')
