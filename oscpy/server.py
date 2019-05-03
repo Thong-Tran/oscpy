@@ -329,7 +329,7 @@ class OSCThreadServer(object):
                     data, sender = sender_socket.recvfrom(65535)
                 except OSError as e:
                     from sys import platform
-                    if platform == 'win32'
+                    if platform == 'win32':
                         continue
                     else:
                         raise e
