@@ -42,6 +42,9 @@ def ServerClass(cls):
     return cls
 
 
+__FILE__ = inspect.getfile(ServerClass)
+
+
 class OSCThreadServer(object):
     """A thread-based OSC server.
 
@@ -451,8 +454,7 @@ class OSCThreadServer(object):
         frames = inspect.getouterframes(inspect.currentframe())
         filenames = ''
         for frame, filename, _, function, _, _ in frames:
-            filenames += '\n{} {}'.format(filename, function)
-            if function == '_listen' and re.search(r'oscpy[\\/]server\.py', filename):
+            if function == '_listen' and __FILE__.startswith(filename):
                 break
         else:
             raise RuntimeError('get_sender() not called from a callback in file {} {}'.format(__file__, filenames))
